@@ -13,25 +13,56 @@ class App extends Component {
     super(props);
     this.state = {
       data: [
-        {name: 'John J.', salary: 800, increase: false, id: 1},
-        {name: 'Vlad S.', salary: 3000, increase: true, id: 2},
-        {name: 'Mark B.', salary: 15000, increase: false, id: 3}
+        {name: 'John J.', salary: 800, increase: false, rise: true, id: 1},
+        {name: 'Vlad S.', salary: 3000, increase: true, rise: false, id: 2},
+        {name: 'Mark B.', salary: 15000, increase: false, rise: false, id: 3}
       ]
     }
+    this.maxId = 4
   }
   
- deleteItem = (id) => {
-  this.setState(({data}) => {
-    return {
-      data: data.filter(item => item.id !== id)
+  deleteItem = (id) => {
+    this.setState(({data}) => {
+      return {
+        data: data.filter(item => item.id !== id)
+      }
+    })
+  }
+
+  addItem = (name, salary) => {
+    const newItem = {
+      name,
+      salary,
+      increase: false,
+      rise: false,
+      id: this.maxId++
     }
-  })
+    this.setState(({data}) => {
+      const newArr = [...data, newItem];
+            return {
+              data: newArr
+            }
+    });
+  }
+
+ onToggleProp = (id, prop) => {
+  this.setState(({data}) => ({
+    data: data.map(item => {
+      if (item.id === id) {
+        return {...item, [prop]: !item[prop]}
+      }
+      return item;
+    })
+  }))
  }
+
   
   render() {
+    const employees =  this.state.data.length;
+    const increased = this.state.data.filter(item => item.increase).length;
     return (
       <div className="app">
-          <AppInfo />
+          <AppInfo employees={employees} increased={increased}/>
   
           <div className="search-panel">
               <SearchPanel/>
@@ -41,8 +72,9 @@ class App extends Component {
           <EmployeesList 
           data={this.state.data}
           onDelete={this.deleteItem}
+          onToggleProp={this.onToggleProp}
           />
-          <EmployeesAddForm/>
+          <EmployeesAddForm onAdd={this.addItem} />
       </div>
     );
   }
